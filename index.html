@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Backrooms — the mold</title>
+<link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="input"></div>
+<div id="start"><div class="card" id="startCard"><div class="kicker">BACKROOMS</div><p class="boot">Loading…</p></div></div>
+<div id="hud">
+  <button id="bLight">LIGHT</button>
+  <button id="bCrouch">CROUCH</button>
+  <button id="bFx" class="on">FX</button>
+  <button id="bQ">RES</button>
+</div>
+<button id="bFire">FIRE</button>
+<button id="bUse">USE</button>
+<div id="prompt"></div>
+<div id="stick"><div id="knob"></div></div>
+<div id="toast"></div>
+<div id="nosig">NO SIGNAL</div>
+<div id="end"><div class="card"><div class="kicker">END OF FOOTAGE</div><h1>THE RECORDING STOPS HERE</h1><p>The mold reached the camera.</p><div class="go-row"><button class="go" id="again">Start again</button></div></div></div>
+<div id="hint">Click (or drag) to look around · WASD · Shift run · hold mouse or Space to fire · E use · F light · C crouch</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

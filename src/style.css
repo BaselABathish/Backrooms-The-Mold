@@ -1,0 +1,106 @@
+html, body {
+  margin: 0; height: 100%; background: #000; overflow: hidden;
+  touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif; color: #ddd;
+}
+/* the 4:3 video frame; ui/hud.js sizes and centres it (bars above and below, or either side) */
+#c { position: fixed; display: block; background: #000; }
+/* full-screen layer that receives mouse and touch input, including over the letterbox bars */
+#input { position: fixed; inset: 0; z-index: 3; }
+button { font-family: inherit; }
+
+/* ---------------------------------------------------------------- start screen */
+#start {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, .82); z-index: 20; padding: 24px; box-sizing: border-box; overflow: auto;
+}
+#start .card { max-width: 560px; text-align: center; max-height: 100%; }
+#start .kicker { font: 700 12px Consolas, "Courier New", monospace; letter-spacing: 4px; color: #c9b46a; }
+#start h1 { font: 700 22px/1.25 Consolas, "Courier New", monospace; letter-spacing: 2px; margin: 8px 0 12px; color: #eee; }
+#start p { color: #aaa; line-height: 1.5; margin: 8px 0; }
+#start p.brief { text-align: left; }
+.go-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 16px 0 10px; }
+.go {
+  font: 700 17px system-ui, sans-serif; padding: 13px 34px; border-radius: 8px;
+  border: 1px solid #777; background: #1d1f21; color: #eee; cursor: pointer; min-height: 48px;
+}
+.go:hover { background: #2a2d30; }
+.go:disabled { opacity: .4; cursor: default; }
+.go:disabled:hover { background: #1d1f21; }
+.load { width: min(280px, 72%); margin: 2px auto 6px; transition: opacity .6s; }
+.load .bar { height: 2px; background: #2b2d30; overflow: hidden; border-radius: 1px; }
+.load .bar i { display: block; height: 100%; width: 0; background: #c9b46a; transition: width .3s; }
+#start .load p { font: 12px Consolas, monospace; color: #7d838a; margin: 7px 0 0; }
+.load.done { opacity: 0; }
+#start p.boot { font: 13px Consolas, monospace; color: #7d838a; }
+.keys { font: 12.5px/1.6 Consolas, monospace; color: #8a8f94 !important; white-space: pre-line; }
+.touch .desk { display: none; }
+body:not(.touch) .mob { display: none; }
+
+/* ---------------------------------------------------------------- in play: kept to a minimum, outside the "recording" */
+/* the small buttons go top right, over nothing but ceiling: at the bottom right they covered the fuel gauge */
+#hud {
+  position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: calc(env(safe-area-inset-right) + 12px);
+  display: none; gap: 8px; z-index: 10;
+}
+.touch #hud { display: flex; }
+#hud button {
+  min-width: 52px; min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .25);
+  background: rgba(0, 0, 0, .45); color: #ddd; font: 700 13px Consolas, monospace; cursor: pointer;
+}
+#hud button.on { background: rgba(255, 255, 255, .18); border-color: rgba(255, 255, 255, .6); }
+/* FIRE: big, under the right thumb; hold to fire, drag to aim while firing */
+#bFire {
+  position: fixed; right: calc(env(safe-area-inset-right) + 22px); bottom: calc(env(safe-area-inset-bottom) + 76px);
+  width: 92px; height: 92px; border-radius: 50%; display: none; z-index: 10; touch-action: none;
+  border: 2px solid rgba(240, 150, 70, .65); background: rgba(60, 25, 5, .35); color: #f4c49a; font: 700 15px Consolas, monospace;
+}
+#bFire.on { background: rgba(200, 90, 20, .45); border-color: rgba(255, 190, 120, .9); }
+.touch.playing #bFire { display: block; }
+
+/* USE: above FIRE, only while there's something to use (body.near) */
+#bUse {
+  position: fixed; right: calc(env(safe-area-inset-right) + 34px); bottom: calc(env(safe-area-inset-bottom) + 182px);
+  width: 68px; height: 68px; border-radius: 50%; display: none; z-index: 10; touch-action: none;
+  border: 2px solid rgba(255, 255, 255, .45); background: rgba(0, 0, 0, .4); color: #ddd; font: 700 13px Consolas, monospace;
+}
+#bUse.on { background: rgba(255, 255, 255, .22); }
+.touch.playing.near #bUse { display: block; }
+/* what you can do with what you're facing: small, low, outside the "recording" */
+#prompt {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 52px); transform: translateX(-50%); display: none; z-index: 6;
+  font: 12px Consolas, monospace; color: #c8c8c0; background: rgba(0, 0, 0, .5); padding: 6px 12px; border-radius: 5px;
+  pointer-events: none; white-space: nowrap;
+}
+.playing.near #prompt { display: block; }
+
+#stick {
+  position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .25); background: rgba(255, 255, 255, .06); display: none; z-index: 5; pointer-events: none;
+}
+#knob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(255, 255, 255, .3); }
+
+#toast {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translateX(-50%);
+  background: rgba(0, 0, 0, .6); padding: 8px 14px; border-radius: 6px; font: 13px Consolas, monospace;
+  opacity: 0; transition: opacity .3s; z-index: 15; pointer-events: none; white-space: nowrap;
+}
+#hint {
+  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); font: 12px Consolas, monospace; color: #9aa;
+  background: rgba(0, 0, 0, .55); padding: 8px 14px; border-radius: 6px; display: none; z-index: 6; pointer-events: none; white-space: nowrap;
+}
+@media (max-width: 700px) { #hint { white-space: normal; width: calc(100vw - 48px); text-align: center; } }
+
+/* ---------------------------------------------------------------- the end: the signal goes, then the end card */
+#nosig {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: #000; z-index: 18;
+  color: #bbb; font: 700 26px Consolas, monospace; letter-spacing: 8px;
+}
+#end {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, .86);
+  z-index: 19; padding: 24px; box-sizing: border-box;
+}
+#end .card { max-width: 480px; text-align: center; }
+#end .kicker { font: 700 12px Consolas, "Courier New", monospace; letter-spacing: 4px; color: #c9b46a; }
+#end h1 { font: 700 20px/1.3 Consolas, monospace; letter-spacing: 2px; margin: 8px 0 12px; color: #eee; }
+#end p { color: #aaa; line-height: 1.5; }
